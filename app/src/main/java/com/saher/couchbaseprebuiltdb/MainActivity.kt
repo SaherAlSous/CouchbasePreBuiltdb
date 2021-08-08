@@ -1,14 +1,13 @@
 package com.saher.couchbaseprebuiltdb
 
-import android.app.Application
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.activity.viewModels
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,8 +15,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,14 +28,21 @@ import com.saher.couchbaseprebuiltdb.model.photo
 import com.saher.couchbaseprebuiltdb.model.photoList
 import com.saher.couchbaseprebuiltdb.ui.theme.CouchbasePreBuiltDbTheme
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val profileViewModel by viewModels<MyViewModel>()
+
         setContent {
             CouchbasePreBuiltDbTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    Greeting()
+                    Greeting(
+                        selectedProfile = profileViewModel.selectedProfile,
+                        onSelectProfile = profileViewModel::onSelectProfile
+                    )
 
                 }
             }
@@ -46,7 +51,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting() {
+fun Greeting(
+    selectedProfile: photo,
+    onSelectProfile: (photo: photo) -> Unit
+) {
+
     Row(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -58,36 +67,23 @@ fun Greeting() {
         ) {
             items(photoList) { item ->
                 ProfileCard(photo = item) {
-//                        photoContent(
-//                            id = item.id,
-//                            owner = item.owner,
-//                            secret = item.secret,
-//                            server = item.server,
-//                            farm = item.farm,
-//                            title = item.title,
-//                            ispublic = item.ispublic,
-//                            isfriend = item.isfriend,
-//                            isfamily = item.isfamily,
-//                            url_s = item.url_s,
-//                            height_s = item.height_s,
-//                            width_s = item.width_s
-//                        )
+                    onSelectProfile(item)
                 }
             }
         }
         photoContent(
-            id = "",
-            owner = "",
-            secret = "",
-            server = "",
-            farm = 0,
-            title = "",
-            ispublic = 0,
-            isfamily = 0,
-            isfriend = 0,
-            url_s = "",
-            height_s = 0,
-            width_s = 0
+            id = selectedProfile.id,
+            owner = selectedProfile.owner,
+            secret = selectedProfile.secret,
+            server = selectedProfile.server,
+            farm = selectedProfile.farm,
+            title = selectedProfile.title,
+            ispublic = selectedProfile.ispublic,
+            isfamily = selectedProfile.isfamily,
+            isfriend = selectedProfile.isfriend,
+            url_s = selectedProfile.url_s,
+            height_s = selectedProfile.height_s,
+            width_s = selectedProfile.width_s
         )
     }
 }
@@ -144,7 +140,12 @@ fun photoContent(
     height_s: Int,
     width_s: Int
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(
+            state = ScrollState(0)
+        )
+    ) {
         ImageDisplay(url_s,height_s,width_s)
         RowStringContent("ID: ", id)
         RowStringContent("Owner: ", owner)
@@ -183,7 +184,7 @@ fun RowStringContent(name: String, conent: String) {
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(8.dp)
-            .border(width = 1.dp,shape = RectangleShape, color = Color.LightGray)
+            .border(width = 1.dp, shape = RectangleShape, color = Color.LightGray)
     ) {
         Text(
             text = name,
@@ -199,7 +200,11 @@ fun RowStringContent(name: String, conent: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
+
     CouchbasePreBuiltDbTheme {
-        Greeting()
+//        Greeting(
+//            selectedProfile = profileViewModel.selectedProfile,
+//            onSelectProfile = profileViewModel::onSelectProfile
+//        )
     }
 }
