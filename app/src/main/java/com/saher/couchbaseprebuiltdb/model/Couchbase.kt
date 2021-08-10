@@ -14,6 +14,22 @@ class Couchbase() {
         config.directory = context.getFilesDir().getAbsolutePath()
         val database = Database("primary-directory", config)
 
+//        for (photo in photos) {
+//            val mutablePhoto = MutableDocument(photo.id)
+//            mutablePhoto.setString("id", photo.id)
+//            mutablePhoto.setString("owner", photo.owner)
+//            mutablePhoto.setString("secret", photo.secret)
+//            mutablePhoto.setString("server", photo.server)
+//            mutablePhoto.setInt("farm", photo.farm)
+//            mutablePhoto.setString("title", photo.title)
+//            mutablePhoto.setInt("ispublic", photo.ispublic)
+//            mutablePhoto.setInt("isfriend", photo.isfriend)
+//            mutablePhoto.setInt("isfamily", photo.isfamily)
+//            mutablePhoto.setString("url_s", photo.url_s)
+//            mutablePhoto.setInt("height_s", photo.height_s)
+//            mutablePhoto.setInt("width_s", photo.width_s)
+//            database.save(mutablePhoto)
+//        }
         database.createIndex(
             "reindex",
             IndexBuilder.valueIndex(
@@ -34,7 +50,9 @@ class Couchbase() {
 
         val query = QueryBuilder
             .select(
-                SelectResult.expression(Meta.id),
+       //         SelectResult.all()
+//                SelectResult.expression(Meta.id),
+                SelectResult.property("id"),
                 SelectResult.property("owner"),
                 SelectResult.property("secret"),
                 SelectResult.property("server"),
@@ -52,7 +70,7 @@ class Couchbase() {
         val result = query.execute().allResults()
 
         for (rs in result) {
-           // val doc = database.getDocument(photo.id)
+     //      val doc = database.getDocument(photo.id)
             val id = rs.getString("id")
             val owner = rs.getString("owner")
             val secret = rs.getString("secret")
@@ -82,9 +100,9 @@ class Couchbase() {
                     width_s
                 )
             )
-//            for(photo in photoList){
-//                println("Photo details: ${photo}")
-//            }
+            for(photo in photoList){
+                println("Photo details: ${photo}")
+            }
         }
     }
 }
